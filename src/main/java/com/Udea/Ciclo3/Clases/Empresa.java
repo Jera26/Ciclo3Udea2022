@@ -16,10 +16,10 @@ public class Empresa {
     private String NIT;
 
 
-    public Empresa(String solar_sas, String calle_la_geta, String s, String s1) {
+    public Empresa() {
     }
 
-    public Empresa(String nombre) {
+    public Empresa(String nombre, String direccion ,String telefono, String NIT) {
         this.nombre = nombre;
         this.direccion= direccion;
         this.telefono = telefono;
