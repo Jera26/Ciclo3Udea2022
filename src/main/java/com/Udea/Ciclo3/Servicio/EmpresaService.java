@@ -4,6 +4,8 @@ import com.Udea.Ciclo3.Clases.Empresa;
 import com.Udea.Ciclo3.repositorio.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +27,12 @@ public class EmpresaService {
     }
 
     //Metodo para guardar o actualizar objetos de tipo Empresa
-    public boolean saveOrUpdateEmpresa(Empresa empresa){
+    public Empresa saveOrUpdateEmpresa(Empresa empresa){
         Empresa emp=empresaRepository.save(empresa);
-        if (empresaRepository.findById(emp.getId())!=null){
-            return true;
+
+            return emp;
         }
-        return false;
-    }
+
 
     //metodo delete pendiente eliminar empresa
 
@@ -43,5 +44,7 @@ public class EmpresaService {
         }
         return false;
     }
+
+
 }
 
