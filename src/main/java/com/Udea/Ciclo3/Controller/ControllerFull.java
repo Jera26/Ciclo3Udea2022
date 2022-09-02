@@ -5,8 +5,10 @@ package com.Udea.Ciclo3.Controller;
 
 import com.Udea.Ciclo3.Clases.Empleado;
 import com.Udea.Ciclo3.Clases.Empresa;
+import com.Udea.Ciclo3.Clases.MovimientoDinero;
 import com.Udea.Ciclo3.Servicio.EmpleadoService;
 import com.Udea.Ciclo3.Servicio.EmpresaService;
+import com.Udea.Ciclo3.Servicio.MovimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,8 @@ public class ControllerFull {
     EmpresaService empresaService;
     @Autowired
     EmpleadoService empleadoService;
+    @Autowired
+    MovimientoService movimientoService;
 
     // empresas
     @GetMapping("/enterprises") //Ver json de todas las empresas
@@ -74,4 +78,66 @@ public class ControllerFull {
     public ArrayList<Empleado> EmpleadoPorEmpresa(@PathVariable("id") Integer id){
         return this.empleadoService.obtenerPorEmpresa(id);
     }
+    @PatchMapping("/empleados/{id}")
+    public Empleado actualizarEmpleado(@PathVariable("id") Integer id, @RequestBody Empleado empleado){
+        Empleado empl=empleadoService.getEmpleadoById(id).get();
+        empl.setNombre(empleado.getNombre());
+        empl.setCorreo(empleado.getCorreo());
+        empl.setEmpresa(empleado.getEmpresa());
+        empl.setRol(empleado.getRol());
+        return empleadoService.saveOrUpdateEmpleado(empl);
+    }
+    @DeleteMapping("/empleados/{id}") //Metodo para eliminar empleados por id
+    public String DeleteEmpleado(@PathVariable("id") Integer id){
+        boolean respuesta=empleadoService.deleteEmpleado(id); //eliminamos usando el servicio de nuestro service
+        if (respuesta){ //si la respuesta booleana es true, si se eliminò
+            return "Se pudo eliminar correctamente el empleado con id "+id;
+        }//Si la respuesta booleana es false, no se eliminó
+        return "No se puedo eliminar correctamente el empleado con id "+id;
+    }
+
+    //Movimientos
+    @GetMapping("/movimientos") //Consultar todos los movimientos
+    public List<MovimientoDinero> verMovimientos(){
+        return movimientoService.getAllMovimientos();
+    }
+
+    @PostMapping("/movimientos")
+    public MovimientoDinero guardarMovimiento(@RequestBody MovimientoDinero movimiento){
+        return movimientoService.saveOrUpdateMovimiento(movimiento);
+    }
+
+    @GetMapping("/movimientos/{id}") //Consultar movimiento por id
+    public MovimientoDinero movimientoPorId(@PathVariable("id") Integer id){
+        return movimientoService.getMovimientoById(id);
+    }
+
+    @PatchMapping("/movimientos/{id}")//Editar o actualizar un movimiento
+    public MovimientoDinero actualizarMovimiento(@PathVariable("id") Integer id, @RequestBody MovimientoDinero movimiento){
+        MovimientoDinero mov=movimientoService.getMovimientoById(id);
+        mov.setConcepto(movimiento.getConcepto());
+        mov.setMonto(movimiento.getMonto());
+        mov.setUsuario(movimiento.getUsuario());
+        return movimientoService.saveOrUpdateMovimiento(mov);
+    }
+
+    @DeleteMapping("/movimientos/{id}")
+    public String deleteMovimiento(@PathVariable("id") Integer id){
+        boolean respuesta= movimientoService.deleteMovimiento(id);
+        if (respuesta){
+            return "Se elimino correctamente el movimiento con id " +id;
+        }
+        return "No se pudo eliminar el movimiento con id "+id;
+    }
+
+    @GetMapping("/empleados/{id}/movimientos") //Consultar movimientos por id del empleado
+    public ArrayList<MovimientoDinero> movimientosPorEmpleado(@PathVariable("id") Integer id){
+        return movimientoService.obtenerPorEmpleado(id);
+    }
+
+    @GetMapping("/enterprises/{id}/movimientos") //Consultar movimientos que pertenecen a una empresa por el id de la empresa
+    public ArrayList<MovimientoDinero> movimientosPorEmpresa(@PathVariable("id") Integer id){
+        return movimientoService.obtenerPorEmpresa(id);
+    }
+
 }
