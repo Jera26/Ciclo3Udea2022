@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Lista de Empleados - Ciclo3</title>
+    <title>Lista de Movimientos - Ciclo3</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -22,39 +22,44 @@
 <body>
 
 <div class="container">
-    <h1> Lista de Empleados</h1>
+    <h1> Lista de movimientos</h1>
     <!--Dibujamos la tabla-->
     <br><table class="table table-bordered">
         <tr>
             <th>ID</th>
-            <th>Nombre</th>    <!-- titulos de la tabla -->
-            <th>Correo</th>
-            <th>Empresa</th>
-            <th>Rol</th>
-            <th>Movimientos</th>
+            <th>Valor</th>    <!-- titulos de la tabla -->
+            <th>Concepto</th>
+            <th>Usuario responsable</th>
             <th>Editar</th>
             <th>Eliminar</th>
         </tr>
 
         <!--Llenamos la tabla dibujada-->
         <!--En nuestro controller, creamos en viewEmpleados un modelo con un atributo llamado emplelist donde esta guardada la lista de todas los empleados-->
-        <tr th:each="empleado : ${emplelist}">
-            <td th:text="${empleado.id}"></td>
-            <td th:text="${empleado.nombre}"></td>
-            <td th:text="${empleado.correo}"></td>
-            <td th:text="${empleado.empresa.nombre}"></td>
-            <td th:if="${empleado.rol=='1'}">Administrativo</td>
-            <td th:if="${empleado.rol=='2'}">Operativo</td>
-            <td><button type="button" class="btn btn-info"><a th:href="@{/Empleado/{id}/Movimientos(id=${empleado.id})}">Ver</a></button></td>
-            <td><button type="button" class="btn btn-warning"><a th:href="@{/EditarEmpleado/{id}(id=${empleado.id})}">Editar</a></button></td>
-            <td><button type="button" class="btn btn-danger"><a th:href="@{/EliminarEmpleado/{id}(id=${empleado.id})}">Eliminar</a></button></td>
+        <tr th:each="movimiento: ${movlist}">
+            <td th:text="${movimiento.id}"></td>
+            <td th:text="${movimiento.monto}"></td>
+            <td th:if="${movimiento.concepto=='1'}">Papeleria</td>
+            <td th:if="${movimiento.concepto=='2'}">Servicios Publicos/privados</td>
+            <td th:if="${movimiento.concepto=='3'}">Operativos</td>
+            <td th:if="${movimiento.concepto=='4'}">Caja Menor</td>
+            <td th:if="${movimiento.concepto=='5'}">Tributario</td>
+            <td th:if="${movimiento.concepto=='6'}">Mobiliario</td>
+            <td th:if="${movimiento.concepto=='7'}">Maquinaria y Equipo</td>
+            <td th:if="${movimiento.concepto=='8'}">Nomina</td>
+            <td th:text="${movimiento.usuario.nombre}"></td>
+            <td><button type="button" class="btn btn-warning"><a th:href="@{/EditarMovimiento/{id}(id=${movimiento.id})}">Editar</a></button></td>
+            <td><button type="button" class="btn btn-danger"><a th:href="@{/EliminarMovimiento/{id}(id=${movimiento.id})}">Eliminar</a></button></td>
         </tr>
     </table>
 <!--- creacion de botton agregar empleados--->
-    <button type="button" class="btn btn-info"><a th:href="@{/AgregarEmpleado}">Agregar Nueva Empleado</a></button>
+    <button type="button" class="btn btn-info"><a th:href="@{/AgregarMovimiento}">Agregar Nuevo Movimiento</a></button>
     <br><br>
     <!-- boton que me lleva a la lista de empresas -->
     <button type="button" class="btn btn-primary"><a th:href="@{/VerEmpresas}">Ver lista de Empresas</a></button>
+    <br><br>
+    <!-- boton que me lleva a la lista de empleados -->
+    <button type="button" class="btn btn-primary"><a th:href="@{/VerEmpleados}">Ver lista de Empleados</a></button>
 
 </div>
 
@@ -64,16 +69,16 @@
 
         var msg= [[${mensaje}]];
         if (msg == "saveOK"){
-            Command : toastr["success"]("Empleado registrado con éxito!")
+            Command : toastr["success"]("Movimiento registrado con éxito!")
             }
         else if (msg == "updateOK"){
-            Command : toastr["success"]("Empleado actualizado con éxito!")
+            Command : toastr["success"]("Movimiento actualizado con éxito!")
         }
         else if (msg == "deleteOK"){
-            Command : toastr["error"]("Registro de empleado eliminado con éxito!")
+            Command : toastr["error"]("Movimiento eliminado con éxito!")
         }
         else if (msg == "deleteError"){
-            Command : toastr["error"]("Registro de empleado  no ha sido eliminado!")
+            Command : toastr["error"]("Movimiento no pudo ser eliminado!")
         }
         toastr.options={
             "positionClass": "toast-top-right",
