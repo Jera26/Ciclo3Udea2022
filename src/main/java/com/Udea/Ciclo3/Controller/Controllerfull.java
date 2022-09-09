@@ -6,7 +6,10 @@ import com.Udea.Ciclo3.Clases.MovimientoDinero;
 import com.Udea.Ciclo3.Servicio.EmpleadoService;
 import com.Udea.Ciclo3.Servicio.EmpresaService;
 import com.Udea.Ciclo3.Servicio.MovimientoService;
+import com.Udea.Ciclo3.repositorio.MovimientosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,9 @@ public class Controllerfull {
     EmpleadoService empleadoService;
     @Autowired
     MovimientoService movimientoService;
+
+    @Autowired
+    MovimientosRepository movimientosRepository;
 
     //EMPRESAS ****************************************************************************************
     @GetMapping({"/", "/VerEmpresas"})
@@ -148,10 +154,15 @@ public class Controllerfull {
     }
 
     // ************************  MOVIMIENTO DINERO **********************************************************************
-    @GetMapping("/VerMovimientos")
-    public String viewMovimiento(Model model, @ModelAttribute("mensaje") String mensaje) {
-        List<MovimientoDinero> listMovimientos = movimientoService.getAllMovimientos();
-        model.addAttribute("movlist", listMovimientos);
+    @RequestMapping ("/VerMovimientos")
+    public String viewMovimiento(@RequestParam(value="pagina", required=false, defaultValue = "0") int NumeroPagina,
+                                 @RequestParam(value="medida", required=false, defaultValue = "3") int medida, // numero que muesta las listas
+                                 Model model, @ModelAttribute("mensaje") String mensaje) {
+        Page<MovimientoDinero> paginaMovimientos=movimientosRepository.findAll(PageRequest.of(NumeroPagina,medida));
+        //List<MovimientoDinero> listMovimientos = movimientoService.getAllMovimientos();
+        model.addAttribute("movlist", paginaMovimientos.getContent());
+        model.addAttribute("paginas",new int[paginaMovimientos.getTotalPages()]);
+        model.addAttribute("paginaActual", NumeroPagina);
         model.addAttribute("mensaje", mensaje);
         Long sumaMonto=movimientoService.obtenerSumaMontos();
         model.addAttribute("SumaMontos",sumaMonto);//Mandamos la suma de todos los montos a la plantilla
