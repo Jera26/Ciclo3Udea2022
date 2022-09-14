@@ -8,8 +8,11 @@ import com.Udea.Ciclo3.Servicio.EmpresaService;
 import com.Udea.Ciclo3.Servicio.MovimientoService;
 import com.Udea.Ciclo3.repositorio.MovimientosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -107,6 +110,8 @@ public class Controllerfull {
 
     @PostMapping("/GuardarEmpleado")
     public String guardarEmpleado(Empleado empl, RedirectAttributes redirectAttributes) {
+        String passEncriptada=passwordEncoder().encode(empl.getPassword());
+        empl.setPassword(passEncriptada);
         if (empleadoService.saveOrUpdateEmpleado(empl) == true) {
             redirectAttributes.addFlashAttribute("mensaje", "saveOK");
             return "redirect:/VerEmpleados";
@@ -127,7 +132,8 @@ public class Controllerfull {
 
     @PostMapping("/ActualizarEmpleado")
     public String updateEmpleado(@ModelAttribute("empl") Empleado empl, RedirectAttributes redirectAttributes) {
-
+        String passEncriptada=passwordEncoder().encode(empl.getPassword());
+        empl.setPassword(passEncriptada);
         if (empleadoService.saveOrUpdateEmpleado(empl)) {
             redirectAttributes.addFlashAttribute("mensaje", "updateOK");
             return "redirect:/VerEmpleados";
@@ -154,18 +160,18 @@ public class Controllerfull {
     }
 
     // ************************  MOVIMIENTO DINERO **********************************************************************
-    @RequestMapping ("/VerMovimientos")
-    public String viewMovimiento(@RequestParam(value="pagina", required=false, defaultValue = "0") int NumeroPagina,
-                                 @RequestParam(value="medida", required=false, defaultValue = "3") int medida, // numero que muesta las listas
+    @RequestMapping("/VerMovimientos")
+    public String viewMovimiento(@RequestParam(value = "pagina", required = false, defaultValue = "0") int NumeroPagina,
+                                 @RequestParam(value = "medida", required = false, defaultValue = "3") int medida, // numero que muesta las listas
                                  Model model, @ModelAttribute("mensaje") String mensaje) {
-        Page<MovimientoDinero> paginaMovimientos=movimientosRepository.findAll(PageRequest.of(NumeroPagina,medida));
+        Page<MovimientoDinero> paginaMovimientos = movimientosRepository.findAll(PageRequest.of(NumeroPagina, medida));
         //List<MovimientoDinero> listMovimientos = movimientoService.getAllMovimientos();
         model.addAttribute("movlist", paginaMovimientos.getContent());
-        model.addAttribute("paginas",new int[paginaMovimientos.getTotalPages()]);
+        model.addAttribute("paginas", new int[paginaMovimientos.getTotalPages()]);
         model.addAttribute("paginaActual", NumeroPagina);
         model.addAttribute("mensaje", mensaje);
-        Long sumaMonto=movimientoService.obtenerSumaMontos();
-        model.addAttribute("SumaMontos",sumaMonto);//Mandamos la suma de todos los montos a la plantilla
+        Long sumaMonto = movimientoService.obtenerSumaMontos();
+        model.addAttribute("SumaMontos", sumaMonto);//Mandamos la suma de todos los montos a la plantilla
         return "verMovimientos";
     }
 
@@ -225,8 +231,8 @@ public class Controllerfull {
     public String movimientosPorEmpleado(@PathVariable("id") Integer id, Model model) {
         List<MovimientoDinero> movlist = movimientoService.obtenerPorEmpleado(id);
         model.addAttribute("movlist", movlist);
-        Long sumaMonto=movimientoService.MontosPorEmpleado(id);
-        model.addAttribute("SumaMontos",sumaMonto);
+        Long sumaMonto = movimientoService.MontosPorEmpleado(id);
+        model.addAttribute("SumaMontos", sumaMonto);
 
         return "verMovimientos"; //Llamamos al HTML
     }
@@ -235,8 +241,15 @@ public class Controllerfull {
     public String movimientosPorEmpresa(@PathVariable("id") Integer id, Model model) {
         List<MovimientoDinero> movlist = movimientoService.obtenerPorEmpresa(id);
         model.addAttribute("movlist", movlist);
-        Long sumaMonto=movimientoService.MontosPorEmpresa(id);
-        model.addAttribute("SumaMontos",sumaMonto);
+        Long sumaMonto = movimientoService.MontosPorEmpresa(id);
+        model.addAttribute("SumaMontos", sumaMonto);
         return "verMovimientos"; //Llamamos al HTML
     }
+
+
+    // Metodo para encriptar contraseñas
+     @Bean
+     public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+   }
 }
