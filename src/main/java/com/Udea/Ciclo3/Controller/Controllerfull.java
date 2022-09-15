@@ -7,10 +7,13 @@ import com.Udea.Ciclo3.Servicio.EmpleadoService;
 import com.Udea.Ciclo3.Servicio.EmpresaService;
 import com.Udea.Ciclo3.Servicio.MovimientoService;
 import com.Udea.Ciclo3.repositorio.MovimientosRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -132,8 +135,12 @@ public class Controllerfull {
 
     @PostMapping("/ActualizarEmpleado")
     public String updateEmpleado(@ModelAttribute("empl") Empleado empl, RedirectAttributes redirectAttributes) {
-        String passEncriptada=passwordEncoder().encode(empl.getPassword());
-        empl.setPassword(passEncriptada);
+        Integer id= empl.getId();//Sacamos el id del objeto empl
+        String Oldpass=empleadoService.getEmpleadoById(id).get().getPassword();//Con ese id consultamos la contraseña que ya esta en la base
+        if(!empl.getPassword().equals(Oldpass)) {
+            String passEncriptada = passwordEncoder().encode(empl.getPassword());
+            empl.setPassword(passEncriptada);
+        }
         if (empleadoService.saveOrUpdateEmpleado(empl)) {
             redirectAttributes.addFlashAttribute("mensaje", "updateOK");
             return "redirect:/VerEmpleados";
@@ -180,8 +187,10 @@ public class Controllerfull {
         MovimientoDinero movimiento = new MovimientoDinero();
         model.addAttribute("mov", movimiento);
         model.addAttribute("mensaje", mensaje);
-        List<Empleado> listaEmpleados = empleadoService.getAllEmpleado();
-        model.addAttribute("emplelist", listaEmpleados);
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        String correo=auth.getName();
+        Integer idEmpleado=movimientoService.IdPorCorreo(correo);
+        model.addAttribute("idEmpleado", idEmpleado);
         return "agregarMovimiento"; //Llamar HTML//
     }
 
@@ -245,7 +254,11 @@ public class Controllerfull {
         model.addAttribute("SumaMontos", sumaMonto);
         return "verMovimientos"; //Llamamos al HTML
     }
-
+     //Controlador que me lleva al template de No autorizado
+    @RequestMapping(value="/Denegado")
+    public String accesoDenegado(){
+        return "accessDenied";
+    }
 
     // Metodo para encriptar contraseñas
      @Bean

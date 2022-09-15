@@ -20,6 +20,7 @@
 <body>
 
 <div class="container">
+  <p th:inline="text" class="text-fixed">User: [[${#httpServletRequest.remoteUser}]]</p><!--Para ver quien esta en linea -->
   <button type="button" class="btn btn-warning" style="float:right"><a th:href="@{/logout}">Cerrar Sesión</a></button>
 
   <h1> Agregue aqui los datos de Empresa</h1>

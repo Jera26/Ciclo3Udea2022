@@ -20,6 +20,7 @@
 <body>
 
 <div class="container">
+  <p th:inline="text" class="text-fixed">User: [[${#httpServletRequest.remoteUser}]]</p><!--Para ver quien esta en linea -->
   <button type="button" class="btn btn-warning" style="float:right"><a th:href="@{/logout}">Cerrar Sesión</a></button>
 
   <h1> Actualize aqui los datos del Empleado</h1>
@@ -87,7 +88,7 @@
       <div class="form-group col-md-12">
         <label class="col-md-3" for="password">Contraseña del empleado:</label>
         <div class="col-md-6">
-          <input type="password" th:field="*{password}" class="form-control" id="password"></div>
+          <input type="text" th:field="*{password}" class="form-control" id="password"></div>
       </div>
     </div>
 
@@ -116,6 +117,11 @@
   <br>
   <a href="javascript: history.go(-1)" class="btn btn-info" role="button">Atrás</a>
 
-</div>
+</div><!--script para ocultar la contraseña-->
+
+<script th:inline="javascript">
+  window.onload=function(){
+  document.getElementById("password").type="password"}
+</script>
 </body>
 </html>
